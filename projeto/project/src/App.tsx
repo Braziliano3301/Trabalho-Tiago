@@ -26,6 +26,22 @@ import Cadastro from './components/Cadastro';
 
 // Modal de Login
 function LoginModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('');
+  const [erro, setErro] = useState('');
+
+  function handleLogin(e: React.FormEvent) {
+    e.preventDefault();
+    if (email === 'email@email.com' && senha === '123456') {
+      setErro('');
+      setEmail('');
+      setSenha('');
+      onClose();
+    } else {
+      setErro('E-mail ou senha inválidos.');
+    }
+  }
+
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
@@ -38,19 +54,29 @@ function LoginModal({ open, onClose }: { open: boolean; onClose: () => void }) {
           &times;
         </button>
         <h2 className="text-2xl font-bold mb-6 text-center">Entrar</h2>
-        <input
-          type="email"
-          placeholder="E-mail"
-          className="w-full mb-4 px-3 py-2 border rounded"
-        />
-        <input
-          type="password"
-          placeholder="Senha"
-          className="w-full mb-6 px-3 py-2 border rounded"
-        />
-        <button className="w-full bg-blue-600 text-white py-2 rounded mb-2 hover:bg-blue-700 transition-colors">
-          Entrar
-        </button>
+        <form onSubmit={handleLogin}>
+          <input
+            type="email"
+            placeholder="E-mail"
+            className="w-full mb-4 px-3 py-2 border rounded"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+          />
+          <input
+            type="password"
+            placeholder="Senha"
+            className="w-full mb-6 px-3 py-2 border rounded"
+            value={senha}
+            onChange={e => setSenha(e.target.value)}
+          />
+          {erro && <div className="text-red-500 text-sm mb-4">{erro}</div>}
+          <button
+            type="submit"
+            className="w-full bg-blue-600 text-white py-2 rounded mb-2 hover:bg-blue-700 transition-colors"
+          >
+            Entrar
+          </button>
+        </form>
       </div>
     </div>
   );
@@ -151,10 +177,73 @@ function App() {
     );
   }
 
+  // Modifique o LoginModal para aceitar setCurrentPage
+  function LoginModalWithRedirect(props: { open: boolean; onClose: () => void; onLoginSuccess: () => void }) {
+    const [email, setEmail] = useState('');
+    const [senha, setSenha] = useState('');
+    const [erro, setErro] = useState('');
+
+    function handleLogin(e: React.FormEvent) {
+      e.preventDefault();
+      if (email === 'email@email.com' && senha === '123456') {
+        setErro('');
+        setEmail('');
+        setSenha('');
+        props.onClose();
+        props.onLoginSuccess();
+      } else {
+        setErro('E-mail ou senha inválidos.');
+      }
+    }
+
+    if (!props.open) return null;
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+        <div className="bg-white p-8 shadow-md w-full max-w-sm relative rounded-2xl">
+          <button
+            className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-xl"
+            onClick={props.onClose}
+            aria-label="Fechar"
+          >
+            &times;
+          </button>
+          <h2 className="text-2xl font-bold mb-6 text-center">Entrar</h2>
+          <form onSubmit={handleLogin}>
+            <input
+              type="email"
+              placeholder="E-mail"
+              className="w-full mb-4 px-3 py-2 border rounded"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+            />
+            <input
+              type="password"
+              placeholder="Senha"
+              className="w-full mb-6 px-3 py-2 border rounded"
+              value={senha}
+              onChange={e => setSenha(e.target.value)}
+            />
+            {erro && <div className="text-red-500 text-sm mb-4">{erro}</div>}
+            <button
+              type="submit"
+              className="w-full bg-blue-600 text-white py-2 rounded mb-2 hover:bg-blue-700 transition-colors"
+            >
+              Entrar
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-white">
       {/* Modal de Login */}
-      <LoginModal open={showLogin} onClose={() => setShowLogin(false)} />
+      <LoginModalWithRedirect
+        open={showLogin}
+        onClose={() => setShowLogin(false)}
+        onLoginSuccess={() => setCurrentPage('dashboard')}
+      />
       {/* Header */}
       <header className="bg-white shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
